@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.claude/settings.local.json
+
+# Scraped raw data (regenerable via parsers)
+parser/raw_*.json
+parser/reference_table.*
+parser/guard_blocked.json
+parser/validation_queue.json
+parser/llm_batch_*.json
+parser/_kdl_sitemap_urls.txt

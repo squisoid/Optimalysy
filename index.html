@@ -1,0 +1,428 @@
+<title>Optimalysy — подбор лабораторий</title>
+<style>
+  :root{
+    --ground:#F6F8F7; --surface:#FFFFFF; --ink:#152420; --muted:#5B6B66;
+    --line:#E3EAE7; --accent:#0F766E; --accent-ink:#0B5B54; --accent-soft:#DCEeeA;
+    --good:#15803D; --good-soft:#DCF3E3; --warn:#9A5B0B; --warn-soft:#F6E9D3;
+    --radius:14px;
+    --mono:"SF Mono",ui-monospace,"Cascadia Code",Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ground:#0E1512; --surface:#161F1C; --ink:#E8EFEC; --muted:#9BADA7;
+      --line:#27332F; --accent:#2DD4BF; --accent-ink:#7FEADE; --accent-soft:#12312D;
+      --good:#4ADE80; --good-soft:#132C22; --warn:#FBBF24; --warn-soft:#2A2313;
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#F6F8F7; --surface:#FFFFFF; --ink:#152420; --muted:#5B6B66;
+    --line:#E3EAE7; --accent:#0F766E; --accent-ink:#0B5B54; --accent-soft:#DCEeeA;
+    --good:#15803D; --good-soft:#DCF3E3; --warn:#9A5B0B; --warn-soft:#F6E9D3;
+  }
+  :root[data-theme="dark"]{
+    --ground:#0E1512; --surface:#161F1C; --ink:#E8EFEC; --muted:#9BADA7;
+    --line:#27332F; --accent:#2DD4BF; --accent-ink:#7FEADE; --accent-soft:#12312D;
+    --good:#4ADE80; --good-soft:#132C22; --warn:#FBBF24; --warn-soft:#2A2313;
+  }
+
+  *{box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);
+    line-height:1.5;-webkit-font-smoothing:antialiased;margin:0}
+  .wrap{max-width:900px;margin:0 auto;padding:32px 20px 64px;
+    display:flex;flex-direction:column;gap:20px}
+
+  header.top{display:flex;flex-direction:column;gap:4px}
+  .brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .brand h1{font-size:26px;font-weight:680;letter-spacing:-.02em;margin:0}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);
+    display:inline-block;transform:translateY(-2px)}
+  .brand .cityline{color:var(--muted);font-size:14px}
+  .lede{color:var(--muted);font-size:14.5px;max-width:62ch}
+
+  .card{background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--radius);padding:20px}
+  .card h2{font-size:12px;font-weight:640;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 14px}
+
+  label.fld{font-size:13px;font-weight:600;color:var(--ink);display:block;margin-bottom:8px}
+  textarea{width:100%;min-height:132px;resize:vertical;font-family:var(--mono);
+    font-size:13.5px;line-height:1.55;color:var(--ink);background:var(--ground);
+    border:1px solid var(--line);border-radius:10px;padding:12px 13px}
+  textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}
+  button.go{font:inherit;font-weight:640;font-size:14px;color:#fff;background:var(--accent);
+    border:none;border-radius:10px;padding:11px 20px;cursor:pointer}
+  button.go:hover{filter:brightness(1.06)}
+  button.go:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px}
+  .hint{color:var(--muted);font-size:12.5px}
+
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+  .chip{font-size:12.5px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);
+    background:var(--ground);color:var(--ink);display:inline-flex;align-items:center;gap:6px}
+  .chip.ok{background:var(--good-soft);border-color:transparent;color:var(--good)}
+  .chip.warn{background:var(--warn-soft);border-color:transparent;color:var(--warn)}
+  .chip.miss{background:transparent;border-style:dashed;color:var(--muted)}
+
+  /* winner summary */
+  .winner{background:var(--accent-soft);border:1px solid transparent;border-radius:var(--radius);
+    padding:22px 22px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .winner .k{font-size:12px;font-weight:640;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink)}
+  .winner .lab{font-size:22px;font-weight:680;margin-top:2px}
+  .winner .price{font-size:34px;font-weight:720;letter-spacing:-.02em;
+    font-variant-numeric:tabular-nums}
+  .winner .sub{color:var(--muted);font-size:13px;margin-top:2px;text-align:right}
+
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  td,th{padding:9px 4px;text-align:left;border-bottom:1px solid var(--line)}
+  th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  tr:last-child td{border-bottom:none}
+  .pill{font-size:11.5px;padding:2px 9px;border-radius:999px;font-weight:600}
+  .pill.full{background:var(--good-soft);color:var(--good)}
+  .pill.part{background:var(--warn-soft);color:var(--warn)}
+  .lead td{font-weight:640}
+
+  .plan{display:flex;flex-direction:column;gap:2px}
+  .line{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .line:last-child{border-bottom:none}
+  .line .nm{font-size:14px}
+  .line .pr{font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted)}
+  .line.cx{background:var(--accent-soft);margin:4px -12px;padding:12px;border-radius:10px;border:none;
+    flex-direction:column;gap:6px}
+  .line.cx .head{display:flex;justify-content:space-between;width:100%;font-weight:640}
+  .line.cx .cover{font-size:12.5px;color:var(--muted)}
+  .line.cx .bonus{font-size:13px;color:var(--good);font-weight:600}
+  .totals{display:flex;flex-direction:column;gap:3px;margin-top:14px;padding-top:12px;border-top:2px solid var(--line)}
+  .totals .t{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+  .totals .t.grand{font-size:18px;font-weight:720}
+  .totals .t .lbl{color:var(--muted);font-weight:500}
+  .totals .t.grand .lbl{color:var(--ink);font-weight:640}
+
+  .callout{border-left:3px solid var(--accent);background:var(--surface);border:1px solid var(--line);
+    border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:14px 16px;font-size:14px}
+  .callout b{font-variant-numeric:tabular-nums}
+  .beta .u{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:10px}
+  .muted{color:var(--muted)}
+  details.flags{font-size:13px}
+  details.flags summary{cursor:pointer;font-weight:600;color:var(--warn)}
+  details.flags ul{margin:10px 0 0;padding-left:18px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+  footer{color:var(--muted);font-size:12px;text-align:center;margin-top:6px}
+  .sec-title{font-size:12px;font-weight:640;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 2px}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="dot"></span>
+      <h1>Optimalysy</h1>
+      <span class="cityline">подбор оптимальных лабораторий · Москва</span>
+    </div>
+    <p class="lede">Вставьте список анализов из рекомендации врача — сервис подберёт, где сдать
+      дешевле всего: по одной лаборатории или с разбивкой, с учётом комплексов, забора крови
+      и «бонусных» анализов, которые достаются почти даром.</p>
+  </header>
+
+  <section class="card">
+    <label class="fld" for="order">Рекомендации врача</label>
+    <textarea id="order" spellcheck="false" placeholder="Вставьте анализы — по одному на строку или через запятую. Например:&#10;25-OH витамин D&#10;ферритин, железо&#10;ТТГ, Т4 свободный&#10;тестостерон общий"></textarea>
+    <div class="row">
+      <button class="go" id="calc">Рассчитать</button>
+      <span class="hint">Считаются анализы из базы; остальные помечаются «нет в базе».</span>
+    </div>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <div id="results"></div>
+
+  <footer>Данные: 2 лаборатории собраны вживую (Гемотест, KDL), Москва, снимок 03.08.2026.
+    Прочие лаборатории и автопарсинг — в разработке.</footer>
+</div>
+
+<script>
+/* ---------------- данные (снимок; те же, что в data.json) ---------------- */
+const DATA = {
+  analytes:{
+    vit_d:{name:"25-OH Витамин D",kw:["витамин d","витамин д","25-oh","25 oh","25-он","25 он","кальциферол"]},
+    b6:{name:"Витамин B6 (пиридоксин)",kw:["b6","в6","пиридоксин"]},
+    b9:{name:"Витамин B9 (фолиевая к-та)",kw:["b9","в9","фолиев","фолат"]},
+    b12:{name:"Витамин B12 (цианокобаламин)",kw:["b12","в12","цианокобаламин","кобаламин"]},
+    iron:{name:"Железо сывороточное",kw:["желез"],not:["щитовид"]},
+    ferritin:{name:"Ферритин",kw:["феррит"]},
+    zinc:{name:"Цинк (кровь)",kw:["цинк","zn"]},
+    t3:{name:"Т3 свободный",warn:"общий/свободный",kw:["т3","t3","трийодтиронин"]},
+    t4:{name:"Т4 свободный",warn:"общий/свободный",kw:["т4","t4","тироксин"]},
+    tsh:{name:"ТТГ",kw:["ттг","tsh","тиреотроп"]},
+    testosterone:{name:"Тестостерон общий",warn:"общий/свободный",kw:["тестостерон"]},
+    dht:{name:"Дигидротестостерон (ДГТ)",kw:["дгт","дигидро","dht"]},
+    calcium:{name:"Кальций общий",kw:["кальци"]},
+    magnesium:{name:"Магний",kw:["магни"]},
+    phosphorus:{name:"Фосфор неорганический",kw:["фосфор"]},
+    ojss:{name:"ОЖСС",kw:["ожсс","железосвязыв"]}
+  },
+  labs:["Гемотест","KDL"],
+  fees:{"Гемотест":330,"KDL":170},
+  price:{
+    "Гемотест":{vit_d:2290,b6:2870,b9:1330,b12:1290,iron:390,ferritin:890,zinc:1160,
+      t3:730,t4:700,tsh:490,testosterone:770,dht:1890},
+    "KDL":{vit_d:2530,b6:3150,b9:1350,b12:1220,iron:415,ferritin:930,zinc:515,
+      t3:760,t4:745,tsh:705,testosterone:785,dht:2160}
+  },
+  complexes:[
+    {lab:"Гемотест",name:"Чек-ап Pro: витамины и минералы",price:5790,
+     contains:["vit_d","b12","iron","b9","zinc","calcium","magnesium","phosphorus"]},
+    {lab:"Гемотест",name:"Витамины анемии: B9, B12 и обмен железа",price:3970,
+     contains:["iron","b9","b12","ferritin","ojss"]}
+  ],
+  flags:[
+    "KDL: цена забора 170 ₽ — не подтверждена со страницы (стандартное значение), проверить.",
+    "KDL: B6 / B9 / железо / ферритин — из листинга каталога, не с индивидуальной страницы.",
+    "Гемотест «Чек-ап Pro» = 5790 ₽ — цена с клубной скидкой 20%. Без клуба ~7238 ₽ → выбор меняется."
+  ]
+};
+/* ---------------- парсер заказа (словарный, принимает любой ввод) ----------------
+   Распознаёт всё, что описано в DATA.analytes.kw; каждый анализ, который ни с чем
+   не совпал, возвращается в unknown[] и честно показывается как «нет в базе».      */
+function matchItem(hay){
+  const ids=[];
+  if(DATA.analytes.dht.kw.some(k=>hay.includes(k))) ids.push("dht");
+  const hayNoDht = hay.replace(/дигидротестостерон/g,"").replace(/дгт/g,"");
+  for(const id in DATA.analytes){
+    if(id==="dht") continue;
+    const a=DATA.analytes[id];
+    const h = id==="testosterone" ? hayNoDht : hay;
+    const hit=(a.kw||[]).some(k=>h.includes(k)) && !(a.not||[]).some(k=>h.includes(k));
+    if(hit) ids.push(id);
+  }
+  return ids;
+}
+function parseOrder(text){
+  const items = text.split(/[\n,;]+/).map(s=>s.trim()).filter(Boolean);
+  const found=new Set(); const unknown=[];
+  for(const item of items){
+    const ids=matchItem(item.toLowerCase());
+    if(ids.length){ ids.forEach(id=>found.add(id)); }
+    else{
+      const clean=item.replace(/^[-•*\s]+/,"").trim();
+      if(clean.length>1 && !/^\d+$/.test(clean)) unknown.push(clean);
+    }
+  }
+  const ids=Object.keys(DATA.analytes).filter(id=>found.has(id)); // порядок по словарю
+  return {ids, unknown};
+}
+
+/* ---------------- ядро: weighted set cover (DP по маскам) ---------------- */
+function bundlesForLab(lab, required, index){
+  const req = new Set(required); const out=[];
+  for(const a of required){
+    const p = DATA.price[lab] && DATA.price[lab][a];
+    if(p!=null) out.push({cost:p,covers:1<<index[a],label:DATA.analytes[a].name,kind:"single",lab});
+  }
+  for(const c of DATA.complexes){
+    if(c.lab!==lab) continue;
+    let mask=0,any=false;
+    for(const a of c.contains) if(req.has(a)){mask|=1<<index[a];any=true;}
+    if(any) out.push({cost:c.price,covers:mask,label:c.name,kind:"complex",lab});
+  }
+  return out;
+}
+function dpCover(bundles, full){
+  const best=new Map([[0,{cost:0,chosen:[]}]]);
+  const pq=[[0,0,[]]];
+  while(pq.length){
+    let bi=0; for(let i=1;i<pq.length;i++) if(pq[i][0]<pq[bi][0]) bi=i;
+    const [cost,mask,chosen]=pq.splice(bi,1)[0];
+    if(best.has(mask)&&best.get(mask).cost<cost-1e-9) continue;
+    if(mask===full) return {cost,chosen,cov:full};
+    for(const b of bundles){
+      const nm=mask|b.covers; if(nm===mask) continue;
+      const nc=cost+b.cost;
+      if(!best.has(nm)||nc<best.get(nm).cost-1e-9){
+        const ch=chosen.concat([b]); best.set(nm,{cost:nc,chosen:ch}); pq.push([nc,nm,ch]);
+      }
+    }
+  }
+  let bm=0;
+  for(const m of best.keys()){
+    const pc=(x)=>x.toString(2).split("").filter(c=>c==="1").length;
+    if(pc(m)>pc(bm) || (pc(m)===pc(bm) && best.get(m).cost<best.get(bm).cost)) bm=m;
+  }
+  return {cost:best.get(bm).cost,chosen:best.get(bm).chosen,cov:bm};
+}
+function solveSingle(required){
+  const index={}; required.forEach((a,i)=>index[a]=i);
+  const full=(1<<required.length)-1; const res={};
+  for(const lab of DATA.labs){
+    const b=bundlesForLab(lab,required,index);
+    const {cost,chosen,cov}=dpCover(b,full);
+    const fee=DATA.fees[lab]||0;
+    const uncovered=required.filter((a,i)=>!((cov>>i)&1));
+    res[lab]={lab,items:cost,fee,total:cost+fee,chosen,uncovered,labs_used:[lab]};
+  }
+  return res;
+}
+function solveMix(required){
+  const index={}; required.forEach((a,i)=>index[a]=i);
+  const full=(1<<required.length)-1; let best=null;
+  const L=DATA.labs.length;
+  for(let s=1;s<(1<<L);s++){
+    let bundles=[]; for(let i=0;i<L;i++) if((s>>i)&1) bundles=bundles.concat(bundlesForLab(DATA.labs[i],required,index));
+    if(!bundles.length) continue;
+    const {cost,chosen,cov}=dpCover(bundles,full);
+    if(cov!==full) continue;
+    const used=[...new Set(chosen.map(b=>b.lab))];
+    const fee=used.reduce((x,l)=>x+(DATA.fees[l]||0),0);
+    const total=cost+fee;
+    if(!best||total<best.total-1e-9) best={items:cost,fee,total,chosen,labs_used:used,uncovered:[]};
+  }
+  return best;
+}
+function upgradesP(required, winnerLab, baselineItems){
+  const req=new Set(required); const ups=[];
+  for(const c of DATA.complexes){
+    if(c.lab!==winnerLab) continue;
+    if(!required.every(a=>c.contains.includes(a))) continue;
+    const sur=c.price-baselineItems; if(sur<=0) continue;
+    const extras=c.contains.filter(a=>!req.has(a));
+    if(!extras.length) continue;
+    const named=extras.map(a=>[DATA.analytes[a].name, DATA.price[winnerLab] && DATA.price[winnerLab][a]]);
+    const pct=sur<=0.10*baselineItems;
+    const maxE=Math.max(0,...named.map(x=>x[1]||0));
+    const ratio=maxE>=2*sur;
+    if(pct||ratio) ups.push({name:c.name,sur,extras:named,trigger:pct?"≤10%":"≥2×"});
+  }
+  return ups.sort((a,b)=>a.sur-b.sur);
+}
+
+/* ---------------- рендер ---------------- */
+const rub = n => Math.round(n).toLocaleString("ru-RU")+" ₽";
+const esc = s => s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+function extrasOf(name,lab,reqSet){
+  const c=DATA.complexes.find(c=>c.name===name&&c.lab===lab);
+  return c? c.contains.filter(a=>!reqSet.has(a)) : [];
+}
+function renderChips(parsed){
+  const el=document.getElementById("chips"); el.innerHTML="";
+  for(const id of parsed.ids){
+    const a=DATA.analytes[id];
+    const c=document.createElement("span");
+    c.className="chip "+(a.warn?"warn":"ok");
+    c.innerHTML=(a.warn?"⚠️ ":"✓ ")+esc(a.name)+(a.warn?` · уточните: ${a.warn}`:"");
+    el.appendChild(c);
+  }
+  for(const u of parsed.unknown){
+    const c=document.createElement("span");
+    c.className="chip miss"; c.textContent="нет в базе: "+u; el.appendChild(c);
+  }
+}
+function planHTML(plan,title,reqSet){
+  let rows="";
+  const singles=plan.chosen.filter(b=>b.kind==="single").sort((a,b)=>a.cost-b.cost);
+  const cplx=plan.chosen.filter(b=>b.kind==="complex");
+  for(const b of singles)
+    rows+=`<div class="line"><span class="nm">[${esc(b.lab)}] ${esc(b.label)}</span><span class="pr">${rub(b.cost)}</span></div>`;
+  for(const b of cplx){
+    const cov=DATA.complexes.find(c=>c.name===b.label&&c.lab===b.lab).contains.filter(a=>reqSet.has(a)).map(a=>DATA.analytes[a].name);
+    const ex=extrasOf(b.label,b.lab,reqSet).map(a=>DATA.analytes[a].name);
+    rows+=`<div class="line cx"><div class="head"><span>[${esc(b.lab)}] Комплекс «${esc(b.label)}»</span><span>${rub(b.cost)}</span></div>
+      <div class="cover">покрывает: ${cov.map(esc).join(", ")}</div>
+      ${ex.length?`<div class="bonus">🎁 бонусом: ${ex.map(esc).join(", ")}</div>`:""}</div>`;
+  }
+  const unc = plan.uncovered && plan.uncovered.length
+    ? `<div class="t"><span class="lbl" style="color:var(--warn)">Не покрыто</span><span>${plan.uncovered.map(a=>DATA.analytes[a].name).map(esc).join(", ")}</span></div>`:"";
+  return `<p class="sec-title">${esc(title)}</p><div class="plan">${rows}</div>
+    <div class="totals">
+      <div class="t"><span class="lbl">Позиции</span><span>${rub(plan.items)}</span></div>
+      <div class="t"><span class="lbl">Забор (${plan.labs_used.join(", ")})</span><span>${rub(plan.fee)}</span></div>
+      ${unc}
+      <div class="t grand"><span class="lbl">Итого</span><span>${rub(plan.total)}</span></div>
+    </div>`;
+}
+
+function run(){
+  const raw=document.getElementById("order").value;
+  const parsed=parseOrder(raw);
+  const required=parsed.ids;
+  const reqSet=new Set(required);
+  renderChips(parsed);
+  const out=document.getElementById("results");
+
+  const unknownCard = parsed.unknown.length
+    ? `<section class="card"><h2>Нет в базе — пока не считаются</h2>
+        <p class="muted" style="margin:0 0 8px">Эти анализы принял, но цен для них ещё нет (база сейчас — 12 анализов крови × 2 лаборатории). Их нужно добавить в справочник.</p>
+        <div class="chips">${parsed.unknown.map(u=>`<span class="chip miss">${esc(u)}</span>`).join("")}</div></section>`
+    : "";
+
+  if(!required.length){
+    out.innerHTML=(unknownCard||"")+`<section class="card"><p class="muted">Из введённого ничего не удалось сопоставить с базой. Проверьте написание — например «ферритин», «ТТГ», «витамин D».</p></section>`;
+    return;
+  }
+
+  const singles=solveSingle(required);
+  const ranked=Object.values(singles).sort((a,b)=>(a.uncovered.length-b.uncovered.length)||(a.total-b.total));
+  const winner=ranked[0];
+  const mix=solveMix(required);
+
+  // winner summary
+  let html=unknownCard+`<div class="winner">
+    <div><div class="k">Дешевле всего</div><div class="lab">${esc(winner.lab)}</div>
+      <div class="muted" style="font-size:13px">${winner.uncovered.length?"частичное покрытие":"полное покрытие вашего заказа"}</div></div>
+    <div style="text-align:right"><div class="price">${rub(winner.total)}</div>
+      <div class="sub">с учётом забора крови</div></div></div>`;
+
+  // ranking table
+  html+=`<section class="card"><h2>В одной лаборатории · прямой рейс</h2>
+    <table><thead><tr><th>Лаборатория</th><th class="num">Итог</th><th class="num">Покрытие</th></tr></thead><tbody>`;
+  ranked.forEach((p,i)=>{
+    const full=p.uncovered.length===0;
+    html+=`<tr class="${i===0?"lead":""}"><td>${esc(p.lab)}</td><td class="num">${rub(p.total)}</td>
+      <td class="num"><span class="pill ${full?"full":"part"}">${full?"полное":("нет "+p.uncovered.length)}</span></td></tr>`;
+  });
+  html+=`</tbody></table></section>`;
+
+  // winner detail
+  html+=`<section class="card"><h2>Как собрать дешевле всего</h2>${planHTML(winner,"Лучший вариант — "+winner.lab,reqSet)}</section>`;
+
+  // mix + delta
+  const delta=mix?winner.total-mix.total:0;
+  html+=`<section class="card"><h2>Самый дешёвый · возможна разбивка</h2>`;
+  if(mix && delta>1){
+    html+=planHTML(mix,"Микс: "+mix.labs_used.join(" + "),reqSet);
+    html+=`<div class="callout" style="margin-top:14px">Прямой рейс (${esc(winner.lab)}) = <b>${rub(winner.total)}</b>.
+      Разбивка по лабам = <b>${rub(mix.total)}</b> → экономия <b>${rub(delta)}</b>, но это ${mix.labs_used.length} визита вместо одного.</div>`;
+  }else{
+    html+=`<div class="callout">Разбивка по лабораториям не даёт экономии — комплекс в одной лаборатории
+      перебивает любой микс. Лучший вариант остаётся <b>${esc(winner.lab)}</b> за <b>${rub(winner.total)}</b>.</div>`;
+  }
+  html+=`</section>`;
+
+  // beta
+  const ups=upgradesP(required,winner.lab,winner.items);
+  html+=`<section class="card beta"><h2>🎁 Апгрейды за копейки</h2>`;
+  if(!ups.length){
+    html+=`<p class="muted">Единого комплекса «на весь заказ» в лаборатории-победителе нет — заказ гетерогенный
+      (витамины + щитовидка + андрология). Зато выгодный комплекс уже <b>выбран автоматически</b> в плане выше,
+      а лишние анализы (кальций, магний, фосфор) достались бонусом.</p>`;
+  }else{
+    for(const u of ups){
+      html+=`<div class="u"><b>«${esc(u.name)}»</b> — доплата ${rub(u.sur)} <span class="muted">[${u.trigger}]</span><ul class="muted" style="margin:8px 0 0;padding-left:18px">`;
+      for(const [nm,p] of u.extras) html+=`<li>${esc(nm)}${p?` <span class="muted">(обычно ${rub(p)})</span>`:""}</li>`;
+      html+=`</ul></div>`;
+    }
+  }
+  html+=`</section>`;
+
+  // flags
+  html+=`<section class="card"><details class="flags"><summary>⚠️ Флаги данных (влияют на результат)</summary><ul>`;
+  for(const f of DATA.flags) html+=`<li>${esc(f)}</li>`;
+  html+=`</ul></details></section>`;
+
+  out.innerHTML=html;
+}
+
+document.getElementById("calc").addEventListener("click",run);
+document.getElementById("order").addEventListener("keydown",e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==="Enter") run();
+});
+</script>

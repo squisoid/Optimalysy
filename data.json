@@ -1,0 +1,84 @@
+{
+  "_meta": {
+    "city": "Москва",
+    "collected": "2026-08-03",
+    "status": "MVP-прогон: 2 лабы собраны вживую (Гемотест — постранично, KDL — постранично). Остальные 4 лабы — TODO.",
+    "flags": [
+      "KDL: цена забора 170 ₽ — НЕ подтверждена со страницы, стандартное значение, проверить.",
+      "KDL: B6/B9/железо/ферритин — из листинга каталога, не с индивидуальной страницы.",
+      "Гемотест комплекс 'Чек-ап Pro' = 5790 ₽ — цена С КЛУБНОЙ СКИДКОЙ 20%. Без клуба дороже (~7238 ₽). Критично для выбора α!"
+    ]
+  },
+
+  "analytes": [
+    {"id": "vit_d",        "name": "25-OH Витамин D",            "fraction": "",      "synonyms": ["витамин D", "кальциферол", "25-ОН"], "note": ""},
+    {"id": "b6",           "name": "Витамин B6 (пиридоксин)",     "fraction": "",      "synonyms": ["пиридоксин"], "note": "редкий/дорогой (ВЭЖХ)"},
+    {"id": "b9",           "name": "Витамин B9 (фолиевая к-та)",  "fraction": "",      "synonyms": ["фолаты", "фолиевая кислота"], "note": ""},
+    {"id": "b12",          "name": "Витамин B12 (цианокобаламин)","fraction": "",      "synonyms": ["цианокобаламин", "кобаламин"], "note": "не путать с активным B12 (holoTC)"},
+    {"id": "iron",         "name": "Железо сывороточное",         "fraction": "",      "synonyms": ["Fe", "сывороточное железо"], "note": ""},
+    {"id": "ferritin",     "name": "Ферритин",                    "fraction": "",      "synonyms": [], "note": ""},
+    {"id": "zinc",         "name": "Цинк (кровь)",                "fraction": "",      "synonyms": ["Zn"], "note": "микроэлемент, есть не везде"},
+    {"id": "t3",           "name": "Т3 свободный",                "fraction": "free",  "synonyms": ["трийодтиронин свободный"], "note": "⚠️ уточните: бывает общий/свободный"},
+    {"id": "t4",           "name": "Т4 свободный",                "fraction": "free",  "synonyms": ["тироксин свободный"], "note": "⚠️ уточните: бывает общий/свободный"},
+    {"id": "tsh",          "name": "ТТГ",                         "fraction": "",      "synonyms": ["тиреотропный гормон", "TSH"], "note": ""},
+    {"id": "testosterone", "name": "Тестостерон общий",           "fraction": "total", "synonyms": ["тестостерон"], "note": "⚠️ уточните: общий/свободный"},
+    {"id": "dht",          "name": "Дигидротестостерон (ДГТ)",    "fraction": "",      "synonyms": ["DHT"], "note": "редкий, часто на аутсорс"},
+
+    {"id": "calcium",    "name": "Кальций общий",         "fraction": "", "synonyms": [], "note": "бонусный (входит в комплекс)"},
+    {"id": "magnesium",  "name": "Магний",                "fraction": "", "synonyms": [], "note": "бонусный"},
+    {"id": "phosphorus", "name": "Фосфор неорганический", "fraction": "", "synonyms": [], "note": "бонусный"},
+    {"id": "ojss",       "name": "ОЖСС",                  "fraction": "", "synonyms": ["общая железосвязывающая способность"], "note": "бонусный"}
+  ],
+
+  "labs": ["Гемотест", "KDL"],
+
+  "fees": {
+    "Гемотест": 330,
+    "KDL": 170
+  },
+
+  "offerings": [
+    {"analyte": "vit_d",        "lab": "Гемотест", "present": true, "price": 2290, "code": "1.110"},
+    {"analyte": "b6",           "lab": "Гемотест", "present": true, "price": 2870, "code": "4.22"},
+    {"analyte": "b9",           "lab": "Гемотест", "present": true, "price": 1330, "code": "4.3"},
+    {"analyte": "b12",          "lab": "Гемотест", "present": true, "price": 1290, "code": "4.4"},
+    {"analyte": "iron",         "lab": "Гемотест", "present": true, "price": 390,  "code": "4.1"},
+    {"analyte": "ferritin",     "lab": "Гемотест", "present": true, "price": 890,  "code": "4.5"},
+    {"analyte": "zinc",         "lab": "Гемотест", "present": true, "price": 1160, "code": "1.83.2"},
+    {"analyte": "t3",           "lab": "Гемотест", "present": true, "price": 730,  "code": "2.2"},
+    {"analyte": "t4",           "lab": "Гемотест", "present": true, "price": 700,  "code": "2.4"},
+    {"analyte": "tsh",          "lab": "Гемотест", "present": true, "price": 490,  "code": "2.5"},
+    {"analyte": "testosterone", "lab": "Гемотест", "present": true, "price": 770,  "code": "2.9"},
+    {"analyte": "dht",          "lab": "Гемотест", "present": true, "price": 1890, "code": "2.50"},
+
+    {"analyte": "vit_d",        "lab": "KDL", "present": true, "price": 2530, "code": ""},
+    {"analyte": "b6",           "lab": "KDL", "present": true, "price": 3150, "code": ""},
+    {"analyte": "b9",           "lab": "KDL", "present": true, "price": 1350, "code": ""},
+    {"analyte": "b12",          "lab": "KDL", "present": true, "price": 1220, "code": ""},
+    {"analyte": "iron",         "lab": "KDL", "present": true, "price": 415,  "code": ""},
+    {"analyte": "ferritin",     "lab": "KDL", "present": true, "price": 930,  "code": ""},
+    {"analyte": "zinc",         "lab": "KDL", "present": true, "price": 515,  "code": ""},
+    {"analyte": "t3",           "lab": "KDL", "present": true, "price": 760,  "code": ""},
+    {"analyte": "t4",           "lab": "KDL", "present": true, "price": 745,  "code": ""},
+    {"analyte": "tsh",          "lab": "KDL", "present": true, "price": 705,  "code": ""},
+    {"analyte": "testosterone", "lab": "KDL", "present": true, "price": 785,  "code": ""},
+    {"analyte": "dht",          "lab": "KDL", "present": true, "price": 2160, "code": ""}
+  ],
+
+  "complexes": [
+    {
+      "lab": "Гемотест",
+      "name": "Чек-ап Pro: витамины и минералы",
+      "price": 5790,
+      "contains": ["vit_d", "b12", "iron", "b9", "zinc", "calcium", "magnesium", "phosphorus"],
+      "note": "цена с клубной скидкой 20%"
+    },
+    {
+      "lab": "Гемотест",
+      "name": "Витамины анемии: B9, B12 и обмен железа",
+      "price": 3970,
+      "contains": ["iron", "b9", "b12", "ferritin", "ojss"],
+      "note": ""
+    }
+  ]
+}
